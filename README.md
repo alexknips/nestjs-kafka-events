@@ -1,19 +1,19 @@
 # NestJS Kafka Events 🏄‍♀️
+Originally forked from https://github.com/jucr-io/nestjs-kafka-events
+and then versions updated and adapted to my use-case.
+
 Lightweight, tested, straight-forward wrapper around KafkaJS and Confluent's Schema Registry
 to integrate with NestJS.
 
 As the Kafka transporter provided by `@nestjs/microservices` is more focused on the request-response pattern, 
 it was more convenient to build a custom module instead of hacking everything into the provided transporter.
 
-As we use this module at [@jucr-io](https://github.com/jucr-io) to let our microservices communicate with each other
-via events, maintenance should not be a problem - feel free to use and request features if you need some!🚀
-
 ▶️ This module is based on the concept that schemas are managed in a central schema registry and are not registered
 automatically when emitting the first event. This is following the best practices to this topic provided by Confluent.
 
 Just to give you an idea how a workflow could look like:
 
-- Developers registering AVRO schemas at the schema registry (either manually or automatically when someone
+- Developers registering schemas at the schema registry (either manually or automatically when someone
   pushes some changes to a specific branch in a repository).
 - As soon as a schema is registered the first time in the registry, it's available to use for all applications
   relying on this schema registry.
@@ -67,7 +67,7 @@ and [@kafkajs/confluent-schema-registry](https://kafkajs.github.io/confluent-sch
 
 ```typescript
 // (...)
-import { IKafkaEvent, KafkaEventHandler } from '@jucr/nestjs-kafka-events';
+import { IKafkaEvent, KafkaEventHandler } from '@alexknips/nestjs-kafka-events';
 
 interface MyEvent {
   userId: string;
