@@ -6,7 +6,7 @@ import { IKafkaEvent } from '../interfaces';
 import { KafkaMessage } from 'kafkajs';
 
 @Injectable()
-export class KafkaAvroDeserializer {
+export class KafkaDeserializer {
   private schemaRegistry: SchemaRegistry;
 
   constructor(private readonly kafkaLogger: KafkaLogger) {}

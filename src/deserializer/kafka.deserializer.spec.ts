@@ -1,16 +1,16 @@
-import { KafkaAvroDeserializer } from './kafka-avro.deserializer';
+import { KafkaDeserializer } from './kafka.deserializer';
 import { Test, TestingModule } from '@nestjs/testing';
 import { KafkaLogger } from '../loggers';
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry';
 jest.mock('@kafkajs/confluent-schema-registry');
 
-describe('KafkaAvroDeserializer', () => {
-  let kafkaAvroDeserializer: KafkaAvroDeserializer;
+describe('KafkaDeserializer', () => {
+  let kafkaDeserializer: KafkaDeserializer;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        KafkaAvroDeserializer,
+        KafkaDeserializer,
         {
           provide: KafkaLogger,
           useValue: {
@@ -19,13 +19,13 @@ describe('KafkaAvroDeserializer', () => {
         },
       ],
     }).compile();
-    kafkaAvroDeserializer = module.get<KafkaAvroDeserializer>(
-      KafkaAvroDeserializer,
+    kafkaDeserializer = module.get<KafkaDeserializer>(
+      KafkaDeserializer,
     );
   });
 
   it('should be defined', () => {
-    expect(kafkaAvroDeserializer).toBeDefined();
+    expect(kafkaDeserializer).toBeDefined();
   });
 
   it('should initialize the schema registry and run a probe', async () => {
@@ -33,7 +33,7 @@ describe('KafkaAvroDeserializer', () => {
       .spyOn(SchemaRegistry.prototype, 'getLatestSchemaId')
       .mockResolvedValueOnce(1);
 
-    await kafkaAvroDeserializer.initialize(
+    await kafkaDeserializer.initialize(
       {
         api: { host: 'http://my-host.com:9093' },
       },
@@ -63,7 +63,7 @@ describe('KafkaAvroDeserializer', () => {
         };
       });
 
-    const result = await kafkaAvroDeserializer.deserialize({
+    const result = await kafkaDeserializer.deserialize({
       value: Buffer.from('test-valyue'),
       key: Buffer.from('test-key'),
       timestamp: date.valueOf().toString(),

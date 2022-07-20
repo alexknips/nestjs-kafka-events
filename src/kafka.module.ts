@@ -17,8 +17,8 @@ import {
 import { KafkaEventFunctionsService } from './kafka-event-functions.service';
 import { MetadataScanner } from '@nestjs/core';
 import { KafkaLogger } from './loggers';
-import { KafkaAvroDeserializer } from './deserializer';
-import { KafkaAvroSerializer } from './serializer';
+import { KafkaDeserializer } from './deserializer';
+import { KafkaSerializer } from './serializer';
 
 @Global()
 @Module({
@@ -38,7 +38,7 @@ export class KafkaModule implements OnModuleInit {
   ): DynamicModule {
     const svc: Provider = {
       provide: KafkaService,
-      useClass: KafkaService,
+      useFactory: () => KafkaService,
       inject: [KafkaModuleConfigurationProvider, KafkaEventFunctionsService],
     };
     const kafkaModuleConfigurationProvider: Provider =
@@ -50,8 +50,8 @@ export class KafkaModule implements OnModuleInit {
       providers: [
         kafkaModuleConfigurationProvider,
         KafkaModuleConfigurationProvider,
-        KafkaAvroDeserializer,
-        KafkaAvroSerializer,
+        KafkaDeserializer,
+        KafkaSerializer,
         KafkaLogger,
         svc,
       ],

@@ -1,16 +1,16 @@
-import { KafkaAvroSerializer } from './kafka-avro.serializer';
+import { KafkaSerializer } from './kafka.serializer';
 import { Test, TestingModule } from '@nestjs/testing';
 import { KafkaLogger } from '../loggers';
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry';
 jest.mock('@kafkajs/confluent-schema-registry');
 
-describe('KafkaAvroSerializer', () => {
-  let kafkaAvroSerializer: KafkaAvroSerializer;
+describe('KafkaSerializer', () => {
+  let kafkaSerializer: KafkaSerializer;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        KafkaAvroSerializer,
+        KafkaSerializer,
         {
           provide: KafkaLogger,
           useValue: {
@@ -20,7 +20,7 @@ describe('KafkaAvroSerializer', () => {
       ],
     }).compile();
 
-    kafkaAvroSerializer = module.get<KafkaAvroSerializer>(KafkaAvroSerializer);
+    kafkaSerializer = module.get<KafkaSerializer>(KafkaSerializer);
   });
 
   afterEach(() => {
@@ -32,7 +32,7 @@ describe('KafkaAvroSerializer', () => {
   });
 
   it('should be defined', () => {
-    expect(kafkaAvroSerializer).toBeDefined();
+    expect(kafkaSerializer).toBeDefined();
   });
 
   it('should initialize correctly and fetch all schemas initially', async () => {
@@ -40,7 +40,7 @@ describe('KafkaAvroSerializer', () => {
       .spyOn(SchemaRegistry.prototype, 'getLatestSchemaId')
       .mockResolvedValue(10);
 
-    await kafkaAvroSerializer.initialize(
+    await kafkaSerializer.initialize(
       {
         api: { host: 'http://my-host.com:9093' },
       },
@@ -52,11 +52,11 @@ describe('KafkaAvroSerializer', () => {
       },
       undefined,
     );
-    expect(kafkaAvroSerializer.schemas.get('test.topic1')).toEqual({
+    expect(kafkaSerializer.schemas.get('test.topic1')).toEqual({
       keyId: 10,
       valueId: 10,
     });
-    expect(kafkaAvroSerializer.schemas.get('test.topic2')).toEqual({
+    expect(kafkaSerializer.schemas.get('test.topic2')).toEqual({
       keyId: 10,
       valueId: 10,
     });
@@ -65,7 +65,7 @@ describe('KafkaAvroSerializer', () => {
 
   it('should serialize a given payload', async () => {
     await expect(
-      kafkaAvroSerializer.serialize({
+      kafkaSerializer.serialize({
         event: {
           name: 'test',
         },
@@ -84,13 +84,13 @@ describe('KafkaAvroSerializer', () => {
         }
         return Buffer.from('test-val');
       });
-    kafkaAvroSerializer['schemaRegistry'] = new SchemaRegistry({ host: '' });
-    kafkaAvroSerializer.schemas.set('test.topic.new', {
+    kafkaSerializer['schemaRegistry'] = new SchemaRegistry({ host: '' });
+    kafkaSerializer.schemas.set('test.topic.new', {
       keyId: 10,
       valueId: 20,
     });
 
-    const result1 = await kafkaAvroSerializer.serialize({
+    const result1 = await kafkaSerializer.serialize({
       topic: 'test.topic.new',
       event: {
         name: 'test',
@@ -102,12 +102,12 @@ describe('KafkaAvroSerializer', () => {
     expect(result1.value).toEqual(Buffer.from('test-val'));
     expect(result1.key).toEqual(Buffer.from('test-key'));
 
-    kafkaAvroSerializer.schemas.set('test.topic.new', {
+    kafkaSerializer.schemas.set('test.topic.new', {
       valueId: 20,
       keyId: null,
     });
 
-    const result2 = await kafkaAvroSerializer.serialize({
+    const result2 = await kafkaSerializer.serialize({
       topic: 'test.topic.new',
       event: {
         name: 'test',

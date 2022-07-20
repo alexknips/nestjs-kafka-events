@@ -15,8 +15,8 @@ import {
   SeekEntry,
   TopicMessages,
 } from 'kafkajs';
-import { KafkaAvroSerializer } from './serializer';
-import { KafkaAvroDeserializer } from './deserializer';
+import { KafkaSerializer } from './serializer';
+import { KafkaDeserializer } from './deserializer';
 import { IKafkaModuleConfiguration } from './interfaces';
 import { EmitKafkaEventPayload } from './interfaces';
 import { getSchemaRegistryValueSubjectByTopic } from './helpers/topic-subject.helper';
@@ -39,8 +39,8 @@ export class KafkaService
     private readonly kafkaModuleConfigurationProvider: KafkaModuleConfigurationProvider,
     private readonly kafkaEventFunctionsService: KafkaEventFunctionsService,
     private readonly kafkaLogger: KafkaLogger,
-    private readonly kafkaAvroSerializer: KafkaAvroSerializer,
-    private readonly kafkaAvroDeserializer: KafkaAvroDeserializer,
+    private readonly kafkaSerializer: KafkaSerializer,
+    private readonly kafkaDeserializer: KafkaDeserializer,
   ) {
     this.config = kafkaModuleConfigurationProvider.get();
     this.kafka = new Kafka({
@@ -83,7 +83,7 @@ export class KafkaService
       );
     }
     if (this.producer) {
-      await this.kafkaAvroSerializer.initialize(
+      await this.kafkaSerializer.initialize(
         this.config.schemaRegistry,
         eventEmitterTopics,
       );
@@ -97,7 +97,7 @@ export class KafkaService
           sTopics[Math.floor(Math.random() * sTopics.length)],
         );
       }
-      await this.kafkaAvroDeserializer.initialize(
+      await this.kafkaDeserializer.initialize(
         this.config.schemaRegistry,
         subjectProbe,
       );
@@ -195,7 +195,7 @@ export class KafkaService
           // retry
           await retry(
             async () => {
-              const event = await this.kafkaAvroDeserializer.deserialize(
+              const event = await this.kafkaDeserializer.deserialize(
                 message,
               );
               await this.kafkaEventFunctionsService.callEventHandler(
@@ -246,7 +246,7 @@ export class KafkaService
         const topicMessages: TopicMessages[] = [];
         for await (const p of payload) {
           topicMessages.push({
-            messages: [await this.kafkaAvroSerializer.serialize(p)],
+            messages: [await this.kafkaSerializer.serialize(p)],
             topic: p.topic,
           });
         }
@@ -257,7 +257,7 @@ export class KafkaService
       }
       await this.producer.send({
         topic: payload.topic,
-        messages: [await this.kafkaAvroSerializer.serialize(payload)],
+        messages: [await this.kafkaSerializer.serialize(payload)],
       });
     } catch (reject) {
       this.kafkaLogger.error(

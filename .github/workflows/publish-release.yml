@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '14.16.1' # LTS
           registry-url: 'https://registry.npmjs.org'
-          scope: '@jucr'
+          scope: '@alexknips'
       - run: yarn
       - run: yarn test
       - run: yarn prepare

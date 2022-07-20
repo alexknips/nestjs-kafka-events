@@ -2,8 +2,8 @@ import { KafkaService } from './kafka.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { KafkaEventFunctionsService } from './kafka-event-functions.service';
 import { KafkaLogger } from './loggers';
-import { KafkaAvroSerializer } from './serializer';
-import { KafkaAvroDeserializer } from './deserializer';
+import { KafkaSerializer } from './serializer';
+import { KafkaDeserializer } from './deserializer';
 import { KafkaModuleConfigurationProvider } from './providers';
 import { Kafka } from 'kafkajs';
 
@@ -12,8 +12,8 @@ jest.mock('kafkajs');
 describe('KafkaService', () => {
   let kafkaService: KafkaService;
   let kafkaEventFunctionsService: KafkaEventFunctionsService;
-  let kafkaAvroSerializer: KafkaAvroSerializer;
-  let kafkaAvroDeserializer: KafkaAvroDeserializer;
+  let kafkaSerializer: KafkaSerializer;
+  let kafkaDeserializer: KafkaDeserializer;
 
   const kafkaJSConsumerConnect = jest.fn();
   const kafkaJSConsumerDisconnect = jest.fn();
@@ -86,14 +86,14 @@ describe('KafkaService', () => {
           },
         },
         {
-          provide: KafkaAvroSerializer,
+          provide: KafkaSerializer,
           useValue: {
             initialize: jest.fn(),
             serialize: jest.fn(),
           },
         },
         {
-          provide: KafkaAvroDeserializer,
+          provide: KafkaDeserializer,
           useValue: {
             initialize: jest.fn(),
             deserialize: jest.fn(),
@@ -106,9 +106,9 @@ describe('KafkaService', () => {
     kafkaEventFunctionsService = module.get<KafkaEventFunctionsService>(
       KafkaEventFunctionsService,
     );
-    kafkaAvroSerializer = module.get<KafkaAvroSerializer>(KafkaAvroSerializer);
-    kafkaAvroDeserializer = module.get<KafkaAvroDeserializer>(
-      KafkaAvroDeserializer,
+    kafkaSerializer = module.get<KafkaSerializer>(KafkaSerializer);
+    kafkaDeserializer = module.get<KafkaDeserializer>(
+      KafkaDeserializer,
     );
   });
 
@@ -164,8 +164,8 @@ describe('KafkaService', () => {
     jest
       .spyOn(kafkaEventFunctionsService, 'getEventEmitterTopics')
       .mockReturnValue(eventEmitterTopics);
-    const serializerInit = jest.spyOn(kafkaAvroSerializer, 'initialize');
-    const deserializerInit = jest.spyOn(kafkaAvroDeserializer, 'initialize');
+    const serializerInit = jest.spyOn(kafkaSerializer, 'initialize');
+    const deserializerInit = jest.spyOn(kafkaDeserializer, 'initialize');
 
     await kafkaService.onApplicationBootstrap();
     expect(serializerInit).toHaveBeenCalled();
@@ -197,7 +197,7 @@ describe('KafkaService', () => {
       },
       arrival: new Date(),
     };
-    jest.spyOn(kafkaAvroDeserializer, 'deserialize').mockResolvedValue(event);
+    jest.spyOn(kafkaDeserializer, 'deserialize').mockResolvedValue(event);
     await kafkaService.onApplicationBootstrap();
     const eachMessage = kafkaJSConsumerRun.mock.calls[0][0].eachMessage;
     const msgPayload = {
@@ -239,7 +239,7 @@ describe('KafkaService', () => {
       topic: 'topic2',
     };
     jest
-      .spyOn(kafkaAvroSerializer, 'serialize')
+      .spyOn(kafkaSerializer, 'serialize')
       .mockImplementation(async (payload) => {
         return {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment

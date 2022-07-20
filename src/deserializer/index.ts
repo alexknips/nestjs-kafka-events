@@ -1,1 +1,1 @@
-export * from './kafka-avro.deserializer';
+export * from './kafka.deserializer';

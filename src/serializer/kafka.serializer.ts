@@ -10,7 +10,7 @@ import { EmitKafkaEventPayload } from '../interfaces';
 import { Message } from 'kafkajs';
 
 @Injectable()
-export class KafkaAvroSerializer {
+export class KafkaSerializer {
   private schemaRegistry: SchemaRegistry;
   schemas: Map<string, { keyId: number | null; valueId: number }> = new Map();
 
