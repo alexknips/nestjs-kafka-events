@@ -19,13 +19,13 @@ Just to give you an idea how a workflow could look like:
   relying on this schema registry.
 
 ### Usage
-➡️ Install via your favorite package manager e.g. `yarn install @jucr/nestjs-kafka-events`
+➡️ Install via your favorite package manager e.g. `yarn install @alexknips/nestjs-kafka-events`
 
 ▶️ Register module at the root of your application:
 
 ```typescript
 // (...)
-import { KafkaModule } from '@jucr/nestjs-kafka-events';
+import { KafkaModule } from '@alexknips/nestjs-kafka-events';
 
 @Module({
   imports: [
@@ -96,7 +96,7 @@ export class AppController {
 ▶️ Produce events:
 ```typescript
 // (...)
-import { KafkaEventEmitter, KafkaService } from '@jucr/nestjs-kafka-events';
+import { KafkaEventEmitter, KafkaService } from '@alexknips/nestjs-kafka-events';
 
 interface MyEvent {
   userId: string;
