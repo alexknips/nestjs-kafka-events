@@ -3,21 +3,21 @@ import {
   Global,
   Module,
   OnModuleInit,
-  Provider,
+  Provider
 } from '@nestjs/common';
+import { MetadataScanner } from '@nestjs/core';
+import { KafkaDeserializer } from './deserializer';
 import {
   IKafkaModuleOptionsFactory,
-  IKafkaModuleRegisterAsyncOptions,
+  IKafkaModuleRegisterAsyncOptions
 } from './interfaces';
-import { KafkaService } from './kafka.service';
-import {
-  KAFKA_MODULE_CONFIGURATION,
-  KafkaModuleConfigurationProvider,
-} from './providers';
 import { KafkaEventFunctionsService } from './kafka-event-functions.service';
-import { MetadataScanner } from '@nestjs/core';
+import { KafkaService } from './kafka.service';
 import { KafkaLogger } from './loggers';
-import { KafkaDeserializer } from './deserializer';
+import {
+  KafkaModuleConfigurationProvider,
+  KAFKA_MODULE_CONFIGURATION
+} from './providers';
 import { KafkaSerializer } from './serializer';
 
 @Global()
@@ -38,9 +38,21 @@ export class KafkaModule implements OnModuleInit {
   ): DynamicModule {
     const svc: Provider = {
       provide: KafkaService,
-      useFactory: () => KafkaService,
-      inject: [KafkaModuleConfigurationProvider, KafkaEventFunctionsService],
+      useClass: KafkaService, 
     };
+    // const svc: Provider = {
+    //   provide: KafkaService,
+    //   // useClass: KafkaService, // This option is only available on factory providers! ->  https://docs.nestjs.com/fundamentals/custom-providers#factory-providers-usefactory
+    //   // useFactory: () => KafkaService,
+
+    //   useFactory: (kafkaModuleConfigurationProvider: KafkaModuleConfigurationProvider,
+    //     kafkaEventFunctionsService: KafkaEventFunctionsService) => {
+    //     const options = optionsProvider.get();
+    //     return new KafkaService());
+    //   },
+
+    //   inject: [KafkaModuleConfigurationProvider, KafkaEventFunctionsService],
+    // };
     const kafkaModuleConfigurationProvider: Provider =
       this.createKafkaModuleConfigurationProvider(options);
     return {
@@ -53,6 +65,7 @@ export class KafkaModule implements OnModuleInit {
         KafkaDeserializer,
         KafkaSerializer,
         KafkaLogger,
+        KafkaService,
         svc,
       ],
       exports: [kafkaModuleConfigurationProvider, svc],
