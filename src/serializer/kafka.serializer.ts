@@ -1,13 +1,12 @@
-import { Injectable } from '@nestjs/common';
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry';
-import { KafkaLogger } from '../loggers';
-import { IKafkaModuleSchemaRegistryConfiguration } from '../interfaces';
+import { Injectable } from '@nestjs/common';
+import { Message } from 'kafkajs';
 import {
   getSchemaRegistryKeySubjectByTopic,
-  getSchemaRegistryValueSubjectByTopic,
+  getSchemaRegistryValueSubjectByTopic
 } from '../helpers/topic-subject.helper';
-import { EmitKafkaEventPayload } from '../interfaces';
-import { Message } from 'kafkajs';
+import { EmitKafkaEventPayload, IKafkaModuleSchemaRegistryConfiguration } from '../interfaces';
+import { KafkaLogger } from '../loggers';
 
 @Injectable()
 export class KafkaSerializer {

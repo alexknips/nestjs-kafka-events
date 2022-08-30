@@ -1,25 +1,23 @@
 import {
   Injectable,
   OnApplicationBootstrap,
-  OnApplicationShutdown,
+  OnApplicationShutdown
 } from '@nestjs/common';
-import { KafkaEventFunctionsService } from './kafka-event-functions.service';
-import { KafkaModuleConfigurationProvider } from './providers';
-import { retry } from './helpers/retry.helper';
-import { KafkaLogger } from './loggers';
 import {
-  Consumer,
+  Admin, Consumer,
   Kafka,
-  Producer,
-  Admin,
-  SeekEntry,
-  TopicMessages,
+  Producer, SeekEntry,
+  TopicMessages
 } from 'kafkajs';
-import { KafkaSerializer } from './serializer';
 import { KafkaDeserializer } from './deserializer';
-import { IKafkaModuleConfiguration } from './interfaces';
-import { EmitKafkaEventPayload } from './interfaces';
+import { retry } from './helpers/retry.helper';
 import { getSchemaRegistryValueSubjectByTopic } from './helpers/topic-subject.helper';
+import { EmitKafkaEventPayload, IKafkaModuleConfiguration } from './interfaces';
+import { KafkaEventFunctionsService } from './kafka-event-functions.service';
+import { KafkaLogger } from './loggers';
+import { KafkaModuleConfigurationProvider } from './providers';
+import { KafkaSerializer } from './serializer';
+
 
 @Injectable()
 export class KafkaService
@@ -42,6 +40,8 @@ export class KafkaService
     private readonly kafkaSerializer: KafkaSerializer,
     private readonly kafkaDeserializer: KafkaDeserializer,
   ) {
+    console.log("===> KafkaService init")
+
     this.config = kafkaModuleConfigurationProvider.get();
     this.kafka = new Kafka({
       ...this.config.client,
@@ -49,12 +49,17 @@ export class KafkaService
         this.kafkaLogger,
       ),
     });
+    console.log("===> kafka init")
+
     if (this.config.consumer) {
       this.consumer = this.kafka.consumer(this.config.consumer);
     }
+    console.log("===> consumer init")
     if (this.config.producer) {
       this.producer = this.kafka.producer(this.config.producer);
     }
+    console.log("===> producer init")
+
     this.admin = this.kafka.admin();
   }
 
