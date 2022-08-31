@@ -40,8 +40,6 @@ export class KafkaService
     private readonly kafkaSerializer: KafkaSerializer,
     private readonly kafkaDeserializer: KafkaDeserializer,
   ) {
-    console.log("===> KafkaService init")
-
     this.config = kafkaModuleConfigurationProvider.get();
     this.kafka = new Kafka({
       ...this.config.client,
@@ -49,17 +47,13 @@ export class KafkaService
         this.kafkaLogger,
       ),
     });
-    console.log("===> kafka init")
 
     if (this.config.consumer) {
       this.consumer = this.kafka.consumer(this.config.consumer);
     }
-    console.log("===> consumer init")
     if (this.config.producer) {
       this.producer = this.kafka.producer(this.config.producer);
     }
-    console.log("===> producer init")
-
     this.admin = this.kafka.admin();
   }
 
