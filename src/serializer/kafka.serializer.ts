@@ -5,7 +5,10 @@ import {
   getSchemaRegistryKeySubjectByTopic,
   getSchemaRegistryValueSubjectByTopic
 } from '../helpers/topic-subject.helper';
-import { EmitKafkaEventPayload, IKafkaModuleSchemaRegistryConfiguration } from '../interfaces';
+import {
+  EmitKafkaEventPayload,
+  IKafkaModuleSchemaRegistryConfiguration
+} from '../interfaces';
 import { KafkaLogger } from '../loggers';
 
 @Injectable()
@@ -49,19 +52,19 @@ export class KafkaSerializer {
    */
   private async fetchSchemaIds(topic: string): Promise<void> {
     try {
-
       // If we cannot find the schema for the key, that's ok
       // catch within an anomomous function so an error just returns null
       const keyId = await (async () => {
         try {
-          const x = (await this.schemaRegistry.getLatestSchemaId(
-            getSchemaRegistryKeySubjectByTopic(topic)
-          )) || null;
+          const x =
+            (await this.schemaRegistry.getLatestSchemaId(
+              getSchemaRegistryKeySubjectByTopic(topic),
+            )) || null;
           return x;
         } catch (error) {
           return null;
         }
-      })()
+      })();
 
       const valueId = await this.schemaRegistry.getLatestSchemaId(
         getSchemaRegistryValueSubjectByTopic(topic),
@@ -70,8 +73,7 @@ export class KafkaSerializer {
         keyId,
         valueId,
       });
-    } 
-    catch (reject) {
+    } catch (reject) {
       this.kafkaLogger.error(
         `Error while fetching schema ids for topic ${topic}`,
         reject,

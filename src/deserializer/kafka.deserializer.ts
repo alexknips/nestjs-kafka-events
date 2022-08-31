@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry';
-import { KafkaLogger } from '../loggers';
-import { IKafkaModuleSchemaRegistryConfiguration } from '../interfaces';
-import { IKafkaEvent } from '../interfaces';
+import { Injectable } from '@nestjs/common';
 import { KafkaMessage } from 'kafkajs';
+import {
+  IKafkaEvent,
+  IKafkaModuleSchemaRegistryConfiguration
+} from '../interfaces';
+import { KafkaLogger } from '../loggers';
 
 @Injectable()
 export class KafkaDeserializer {
@@ -43,8 +45,19 @@ export class KafkaDeserializer {
    * @param message
    */
   async deserialize(message: KafkaMessage): Promise<IKafkaEvent> {
+    // If we cannot deserialize the key schema, that's ok
+    // catch within an anomomous function so an error just returns null
+    const key = await (async () => {
+      try {
+        const key = await this.schemaRegistry.decode(message.key);
+        return key;
+      } catch (error) {
+        // TODO make this work for more than string
+        return String.fromCharCode(... message.key);
+      }
+    })();
+
     try {
-      const key = await this.schemaRegistry.decode(message.key);
       const event = message?.value
         ? await this.schemaRegistry.decode(message.value)
         : message?.value;
@@ -54,7 +67,9 @@ export class KafkaDeserializer {
         key,
       };
     } catch (reject) {
-      this.kafkaLogger.error(`Error while deserializing message`, reject);
+      this.kafkaLogger.error(
+        `Error while deserializing message -> Offset: ${message.offset} Key: ${message.key} Reason: ${reject}`,
+      );
       throw reject;
     }
   }

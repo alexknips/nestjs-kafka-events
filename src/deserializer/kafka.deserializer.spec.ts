@@ -19,9 +19,7 @@ describe('KafkaDeserializer', () => {
         },
       ],
     }).compile();
-    kafkaDeserializer = module.get<KafkaDeserializer>(
-      KafkaDeserializer,
-    );
+    kafkaDeserializer = module.get<KafkaDeserializer>(KafkaDeserializer);
   });
 
   it('should be defined', () => {

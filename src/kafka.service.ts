@@ -1,13 +1,15 @@
 import {
   Injectable,
   OnApplicationBootstrap,
-  OnApplicationShutdown
+  OnApplicationShutdown,
 } from '@nestjs/common';
 import {
-  Admin, Consumer,
+  Admin,
+  Consumer,
   Kafka,
-  Producer, SeekEntry,
-  TopicMessages
+  Producer,
+  SeekEntry,
+  TopicMessages,
 } from 'kafkajs';
 import { KafkaDeserializer } from './deserializer';
 import { retry } from './helpers/retry.helper';
@@ -17,7 +19,6 @@ import { KafkaEventFunctionsService } from './kafka-event-functions.service';
 import { KafkaLogger } from './loggers';
 import { KafkaModuleConfigurationProvider } from './providers';
 import { KafkaSerializer } from './serializer';
-
 
 @Injectable()
 export class KafkaService
@@ -194,9 +195,7 @@ export class KafkaService
           // retry
           await retry(
             async () => {
-              const event = await this.kafkaDeserializer.deserialize(
-                message,
-              );
+              const event = await this.kafkaDeserializer.deserialize(message);
               await this.kafkaEventFunctionsService.callEventHandler(
                 topic,
                 event,

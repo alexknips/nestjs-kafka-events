@@ -107,9 +107,7 @@ describe('KafkaService', () => {
       KafkaEventFunctionsService,
     );
     kafkaSerializer = module.get<KafkaSerializer>(KafkaSerializer);
-    kafkaDeserializer = module.get<KafkaDeserializer>(
-      KafkaDeserializer,
-    );
+    kafkaDeserializer = module.get<KafkaDeserializer>(KafkaDeserializer);
   });
 
   beforeEach(() => {
